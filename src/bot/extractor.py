@@ -10,11 +10,11 @@ from src.core.chase_driver import ChaseDriver
 from src.core.base_scraper import BaseScraper
 from src.bot.selectors import S3Selectors
 from src.modules.user_input import input_token, input_date
-from src.bot.fundos import fundos
 import os
 from src.core.chase_driver import BROWSER_SETTINGS
 import zipfile 
 import tempfile
+from data.query import getFundos
 
 class S3Extractor(BaseScraper):
     def __init__(self):
@@ -229,9 +229,10 @@ class S3Extractor(BaseScraper):
     def download(self):
         self.limpar_pasta(r"S:\DataAnalysis\09 PYTHON\Codigos Data Analysis\extratos_passivo_s3\documents")
         ini, fin = "", ""
-        for f in fundos:
-            nome = f["nome"]
-            code = f["codigo"]
+        df_fundos = getFundos()
+        for idx, row in df_fundos.iterrows():
+            nome = row['Fundo']
+            code = row['cod_custodiante']
             try:
                 if ini == "" and fin == "":
                     ini, fin = self.aplicar_data()
@@ -239,4 +240,60 @@ class S3Extractor(BaseScraper):
                     if self.driver.try_find_visible(selector=S3Selectors.INI_DATE, by=By.XPATH, timeout=2) == None:
                         pass
                     else:
-                        self.driver.find_and_click(selector
+                        self.driver.find_and_click(selector=S3Selectors.INI_DATE, by=By.XPATH)
+                        self.driver.find_and_send_keys(selector=S3Selectors.INI_DATE, text=Keys.CONTROL + "a", by=By.XPATH)
+                        self.driver.find_and_send_keys(selector=S3Selectors.INI_DATE, text=Keys.DELETE, by=By.XPATH)
+                        self.driver.find_and_send_keys(selector=S3Selectors.INI_DATE, text=ini, by=By.XPATH)
+                        time.sleep(1)
+                        self.driver.find_and_click(selector=S3Selectors.FIN_DATE, by=By.XPATH)
+                        self.driver.find_and_send_keys(selector=S3Selectors.FIN_DATE, text=Keys.CONTROL + "a", by=By.XPATH)
+                        self.driver.find_and_send_keys(selector=S3Selectors.FIN_DATE, text=Keys.DELETE, by=By.XPATH)
+                        self.driver.find_and_send_keys(selector=S3Selectors.FIN_DATE, text=fin, by=By.XPATH)
+                        self.driver.find_and_click(selector=S3Selectors.CHECK_BUTTON, by=By.XPATH)
+                        self.ini, self.fin = ini, fin
+                self.driver.wait_for_element_visible(by=By.XPATH, selector=S3Selectors.CODE_INPUT)
+                self.driver.find_and_click(selector=S3Selectors.CODE_INPUT, by=By.XPATH)
+                self.driver.find_and_send_keys(selector=S3Selectors.CODE_INPUT, text=Keys.CONTROL + "a", by=By.XPATH)
+                self.driver.find_and_send_keys(selector=S3Selectors.CODE_INPUT, text=Keys.DELETE, by=By.XPATH)
+                self.driver.find_and_send_keys(selector=S3Selectors.CODE_INPUT, text=code, by=By.XPATH)
+                self.driver.find_and_click(selector=S3Selectors.SEARCH_BUTTON, by=By.XPATH)
+                if self.driver.try_find_visible(selector=S3Selectors.ERROR_OK_BUTTON, by=By.XPATH, timeout=2) == None:
+                    pass
+                else:
+                    self.driver.find_and_click(selector=S3Selectors.ERROR_OK_BUTTON, by=By.XPATH)
+                    time.sleep(1)
+                    continue
+                self.driver.wait_for_element_visible(by=By.XPATH, selector=S3Selectors.CHECKBOX_BUTTON)
+                if self.driver.try_find_visible(selector=S3Selectors.XPATHCHECK, by=By.XPATH, timeout=2): 
+                    self.driver.find_and_click(selector=S3Selectors.CHECKBOX_BUTTON, by=By.XPATH)
+                    time.sleep(1)
+                    self.driver.find_and_click(selector=S3Selectors.CHECKBOX_BUTTON, by=By.XPATH)
+                else:
+                    self.driver.find_and_click(selector=S3Selectors.CHECKBOX_BUTTON, by=By.XPATH)
+                time.sleep(1)
+                self.driver.find_and_click(selector=S3Selectors.CHECK_BUTTON, by=By.XPATH)
+                self.driver.find_and_click(selector=S3Selectors.SEARCH_BUTTON, by=By.XPATH)
+                self.driver.wait_for_element_visible(by=By.XPATH, selector=S3Selectors.CHECKBOX_BUTTON)
+                if self.driver.try_find_visible(selector=S3Selectors.XPATHCHECK, by=By.XPATH, timeout=2):
+                    self.driver.find_and_click(selector=S3Selectors.CHECKBOX_BUTTON, by=By.XPATH)
+                    time.sleep(1)
+                    self.driver.find_and_click(selector=S3Selectors.CHECKBOX_BUTTON, by=By.XPATH)
+                else:
+                    self.driver.find_and_click(selector=S3Selectors.CHECKBOX_BUTTON, by=By.XPATH)
+                time.sleep(1)
+                self.driver.find_and_click(selector=S3Selectors.CHECK_BUTTON, by=By.XPATH)
+                time.sleep(1)
+                self.driver.find_and_click(selector=S3Selectors.OK_BUTTON, by=By.XPATH)
+                self.wait_download_finish()
+                time.sleep(3)
+                destino = self.salva_pasta(nome)
+                resultado = self.mover_download(destino)
+                print("Movido:", resultado)
+                self.limpar_pasta(r"S:\DataAnalysis\09 PYTHON\Codigos Data Analysis\extratos_passivo_s3\documents")
+            except Exception as e:
+                self.logger.error(f"Código: {str(code)}. Erro: {str(e)}")
+        return True
+
+
+    def logout(self):
+        ...
