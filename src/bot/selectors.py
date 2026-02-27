@@ -1,0 +1,26 @@
+class S3Selectors():
+    # login selectors
+    LOGIN_BUTTON = "//a[@class='btn-login']"
+    LOGIN_USERNAME = "//input[@id='signInName']"
+    LOGIN_PASSWORD = "//input[@id='password']"
+    ENTRAR_BUTTON = "//button[@id='next']"
+    EMAIL_OPTION = "//input[@value='email']"
+    CONTINUE_BUTTON = "//button[@id='continue']"
+    SEND_CODE_BUTTON = "//button[@class='sendButton s3btnp']"
+    TOKEN_CODE_INPUT = "//input[@placeholder='Código de verificação']"
+    TOKEN_SUBMIT_BUTTON = "//button[@class='verifyButton verif-email-code']"
+
+    # passivo selectors
+    PASSIVO_BUTTON = "//a[normalize-space(text()) = 'Passivo']"
+    OK_BUTTON = "//*[normalize-space(.) = 'OK']"
+    RELATORIOS_BUTTON = "//span[normalize-space(.) = 'Relatórios']"
+    EXTRATO_BUTTON = "//*[normalize-space(.) = 'Extrato']"
+    MENSAL_BUTTON = "//a[normalize-space(text()) = 'Mensal']"
+    INI_DATE = "//input[@name='dt_inicio']"
+    FIN_DATE = "//input[@name='dt_fim']"
+    CHECK_BUTTON = "//button[@id='tb-confirm']"
+    CODE_INPUT = "//input[@id='#cd_codigo']"
+    SEARCH_BUTTON = "//button[@data-name='dwb_buscar']"
+    CHECKBOX_BUTTON = "(//button[@onclick='XPL.DataGrid.HeaderCheckBoxFormatter.click(this); return false;'])[1]"
+    ERROR_OK_BUTTON = "//button[.//span[normalize-space()='OK']]"
+    XPATHCHECK = "(//button[.//span[contains(@class, 'ui-icon-check')]])[1]"
